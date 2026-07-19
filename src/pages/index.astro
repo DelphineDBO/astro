@@ -17,9 +17,19 @@ for (const post of posts) {
     byTag.get(tag).push(post);
   }
 }
-// Tags triés par nombre d'articles (décroissant), puis alphabétiquement
+// Ordre d'affichage des tags sur l'accueil : ceux listés ici passent en premier, dans cet
+// ordre ; les autres suivent, triés par nombre d'articles (décroissant) puis alphabétiquement.
+// → modifier `tagOrder` à la main pour réorganiser.
+const tagOrder = ['LITTERATURE', 'GOOGLE-WORKSPACE'];
+const rank = (tag) => {
+  const i = tagOrder.indexOf(tag);
+  return i === -1 ? Infinity : i;
+};
 const groups = [...byTag.entries()]
-  .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+  .sort((a, b) =>
+    rank(a[0]) - rank(b[0])
+    || b[1].length - a[1].length
+    || a[0].localeCompare(b[0]));
 if (untagged.length > 0) groups.push(['Divers', untagged]);
 ---
 <BaseLayout>

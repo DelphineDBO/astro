@@ -38,7 +38,9 @@ src/
 │                            Affichée en tête des articles et des projets.
 │
 ├── pages/               → Une route = un fichier :
-│   ├── index.astro       → Accueil : articles regroupés par tag.
+│   ├── index.astro       → Accueil : articles regroupés par tag. L'ordre des groupes se
+│   │                        règle à la main via `tagOrder` en haut du fichier ; les tags
+│   │                        absents suivent, triés par nombre d'articles.
 │   ├── about.astro       → CV / À propos (français).
 │   ├── en/about.astro    → CV / À propos (anglais) + bascule FR/EN.
 │   ├── posts/[slug].astro   → Page d'un article.

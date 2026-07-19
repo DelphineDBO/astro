@@ -125,3 +125,35 @@ Historique des actions réalisées sur le projet. À jour au **2026-07-19**.
 - Delphine dépose les PDF `public/cv-fr.pdf` et `public/cv-en.pdf` (plus tard).
 - Choix d'un **domaine perso** (puis bascule `base` sur `/`), avant de diffuser les liens.
 - Remplir le contenu réel (À propos, premiers articles).
+
+### Corrections Lighthouse (mobile)
+- Rapport PageSpeed transmis par Delphine. Scores mobile relevés (Lighthouse local) :
+  **Performance 100, SEO 100**, Best Practices 96, Accessibilité 94. Les « rouges » n'étaient
+  **pas** de la perf.
+- **Erreur console 404 (Best Practices)** : le favicon pointait vers `/astrofavicon.svg` (slash
+  manquant) car `BaseLayout.astro` construisait l'URL à la main (`${BASE_URL}favicon.svg`). Corrigé
+  en passant par le helper `href('favicon.svg')` → `/astro/favicon.svg`. (Rappel : tous les liens
+  internes doivent passer par `href()`.)
+- **Contraste insuffisant (Accessibilité)** : texte des tags `#6b7a34` sur `--accent-soft`
+  `#eef1e0` = **4.1:1**, sous le seuil AA (4.5:1) pour du 12px. Ajout d'une variable dédiée
+  `--tag-color: #5c6a2c` (olive à peine plus foncé, **5.15:1**) utilisée par `.tag` ; le vert
+  `--accent` de la marque reste inchangé partout ailleurs. Thème sombre déjà à 7:1, laissé via
+  `var(--accent)`.
+- **Non corrigés (hors de notre contrôle / non rentables)** : cache TTL court (10 min) imposé par
+  les en-têtes GitHub Pages ; CSS bloquant (4,5 Ko, gain estimé « None »).
+- Vérifié : `astro build` OK, HTML généré contient `href="/astro/favicon.svg"`, plus aucune
+  occurrence de `astrofavicon`. **Reste à redéployer** pour voir l'effet en ligne.
+
+### Ordre manuel des tags sur l'accueil
+- Demande de Delphine : pouvoir choisir l'ordre des groupes de tags sur l'accueil (ex. LITTERATURE
+  avant GOOGLE-WORKSPACE), au lieu du tri automatique par nombre d'articles.
+- `index.astro` : ajout d'une liste `tagOrder = ['LITTERATURE', 'GOOGLE-WORKSPACE']` en haut du
+  fichier. Les tags qui y figurent passent en premier dans cet ordre ; les autres suivent, triés
+  par nombre d'articles (décroissant) puis alphabétiquement. → Delphine réorganise `tagOrder` à la
+  main quand elle veut.
+- Documenté dans `README.md` (ligne `pages/index.astro`).
+
+### Rappel — LIT-001 / LIT-002
+- Erreur de routing en dev sur ces deux posts : **frontmatter sans champ `reference`** → le slug
+  retombait sur le chemin du fichier (`/posts/LIT-002/Livres - Références…`). Fix = ajouter
+  `reference: LIT-001` / `reference: LIT-002` (dans Obsidian aussi). Delphine s'en charge.
