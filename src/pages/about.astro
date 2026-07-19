@@ -1,55 +1,82 @@
 ---
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { href } from '../lib/url.js';
 
-const pageTitle = "About Me";
+const experiences = [
+  { role: 'Senior Technical Program Manager — Azure Sovereign Cloud', co: 'Microsoft', when: '2022 → présent', d: 'Pilotage de bout en bout du programme de certification SecNumCloud, gouvernance et reporting exécutif entre les équipes d’ingénierie, sécurité, conformité et l’opérateur partenaire.' },
+  { role: 'Head of IT Operations', co: 'Amplifon France', when: '2021 – 2022', d: 'Direction des opérations IT d’un réseau de 700 magasins. Constitution et management d’une équipe de 15 personnes, programme de modernisation réseau de 3 M€.' },
+  { role: 'Head of Infrastructure', co: 'Toshiba TEC France', when: '2020 – 2021', d: 'Programmes concurrents de modernisation (migration AD, SD-WAN, remédiation Oracle) pour 1 200 utilisateurs sur 40 sites, avec des équipes européennes et japonaises.' },
+  { role: 'Security Program Manager — EMEA', co: 'Varonis', when: '2019 – 2020', d: 'Livraison de programmes de cybersécurité de 2 M€+ pour des grands comptes européens, standardisation de la méthodologie de gestion de programme.' },
+  { role: 'Head of Infrastructure (Global)', co: 'Lagardère Travel Retail', when: '2017 – 2019', d: 'Feuille de route infrastructure mondiale (réseau, identité, poste de travail) sur 20 pays, investissements de plusieurs millions d’euros.' },
+  { role: 'Postes précédents', co: 'Amaris · SFR Business / Telindus · Orange Business Services', when: '2013 – 2017', d: 'Gestion de projets et ingénierie réseau / télécoms pour des grands comptes B2B (WAN, LAN, communications unifiées, VoIP).' },
+];
 
-const identity = {
-  firstName: "Sarah",
-  country: "Canada",
-  occupation: "Technical Writer",
-  hobbies: ["photography", "birdwatching", "baseball"],
-};
-
-const skills = ["HTML", "CSS", "JavaScript", "React", "Astro", "Writing Docs"];
-
+const skills = [
+  'Program management infrastructure', 'Transformation & modernisation cloud',
+  'Sécurité & conformité (SecNumCloud, ISO 27001, RGPD)', 'Gouvernance & operating model',
+  'Management de managers', 'Coordination d’équipes distribuées',
+  'Négociation fournisseurs & opérateurs', 'Reporting exécutif & KPI',
+];
 ---
+<BaseLayout title="À propos" description="Delphine — IT Director : transformation d’entreprise et modernisation cloud.">
+  <header>
+    <div class="about-top">
+      <div>
+        <h1>Delphine DBO</h1>
+        <p class="lead">IT Director · Transformation d’entreprise & modernisation cloud</p>
+      </div>
+      <span class="lang-switch"><a href={href('/en/about')}>English ↗</a></span>
+    </div>
+    <div class="about-contact">
+      <a class="btn" href="https://www.linkedin.com/in/delphinebottarlini/" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href="mailto:delphine.bottarlini@gmail.com">delphine.bottarlini@gmail.com</a>
+      <a class="btn" href={href('/cv-fr.pdf')} download>↓ Télécharger le CV</a>
+    </div>
+  </header>
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{pageTitle}</title>
-    <style>
-      h1 {
-        color: purple;
-        font-size: 4rem;
-      }
-      .skill {color:green;font-weight:bold;}
-    </style>
-  </head>
-  <body>
-    <a href="/">Home</a>
-    <a href="/about/">About</a>
-    <a href="/blog/">Blog</a>
-    <h1>{pageTitle}</h1>
-    <h2>... and my new Astro site!</h2>
+  <div class="prose">
+    <p>
+      Leader infrastructure avec <strong>13 ans d’expérience</strong> dans la livraison de
+      programmes d’entreprise, la transformation cloud et la modernisation à grande échelle
+      d’organisations internationales (Microsoft, Lagardère Travel Retail, Toshiba, Amplifon,
+      Varonis). J’ai piloté des programmes de plusieurs millions d’euros sur plus de 20 pays,
+      à l’intersection de l’ingénierie, de la sécurité, de la conformité et de la direction —
+      en transformant l’intention stratégique en résultats mesurables.
+    </p>
+  </div>
 
-    <p>I am working through Astro's introductory tutorial. This is the second page on my website, and it's the first one I built myself!</p>
+  <h2 style="margin-top:2.5rem">Parcours</h2>
+  <div class="cv-list">
+    {experiences.map((e) => (
+      <div class="cv-item">
+        <div class="cv-head">
+          <span><span class="role">{e.role}</span> · <span class="co">{e.co}</span></span>
+          <span class="when">{e.when}</span>
+        </div>
+        <p>{e.d}</p>
+      </div>
+    ))}
+  </div>
 
-    <p>This site will update as I complete more of the tutorial, so keep checking back and see how my journey is going!</p>
-  </body>
+  <h2 style="margin-top:2.5rem">Compétences clés</h2>
+  <div class="tags" style="margin-top:1rem">
+    {skills.map((s) => <span class="tag">{s}</span>)}
+  </div>
 
-<p>Here are a few facts about me:</p>
-<ul>
-  <li>My name is {identity.firstName}.</li>
-  <li>I live in {identity.country} and I work as a {identity.occupation}.</li>
-  {identity.hobbies.length >= 2 &&
-    <li>Two of my hobbies are: {identity.hobbies[0]} and {identity.hobbies[1]}</li>
-  }
-</ul>
-<p>My skills are:</p>
-<ul>
-  {skills.map((skill) => <li class="skill">{skill}</li>)}
-</ul>
-
-</html>
+  <div class="cv-cols">
+    <div>
+      <h2>Formation</h2>
+      <div class="prose">
+        <p><strong>Master Réseaux informatiques</strong><br />Université de Strasbourg · 2013</p>
+        <p><strong>Master Ingénierie d’affaires</strong><br />EM Strasbourg · 2014</p>
+      </div>
+    </div>
+    <div>
+      <h2>Certifications & langues</h2>
+      <div class="prose">
+        <p>ITILv3 Foundation (2017)<br />PMP Initiation (2016)</p>
+        <p>Français — natif<br />Anglais — bilingue</p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

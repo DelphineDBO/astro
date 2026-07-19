@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { href } from '../../lib/url.js';
+
+const experiences = [
+  { role: 'Senior Technical Program Manager — Azure Sovereign Cloud', co: 'Microsoft', when: '2022 → present', d: 'End-to-end delivery of the SecNumCloud certification program; governance and executive reporting across engineering, security, compliance and the operator partner.' },
+  { role: 'Head of IT Operations', co: 'Amplifon France', when: '2021 – 2022', d: 'Ran IT operations for a 700-store retail network. Built and led a 15-person team and a €3M network modernization program.' },
+  { role: 'Head of Infrastructure', co: 'Toshiba TEC France', when: '2020 – 2021', d: 'Concurrent modernization programs (AD migration, SD-WAN, Oracle remediation) for 1,200 users across 40 sites, with European and Japanese teams.' },
+  { role: 'Security Program Manager — EMEA', co: 'Varonis', when: '2019 – 2020', d: 'Delivered €2M+ cybersecurity programs for major European accounts and standardized the program management methodology.' },
+  { role: 'Head of Infrastructure (Global)', co: 'Lagardère Travel Retail', when: '2017 – 2019', d: 'Owned the global infrastructure roadmap (network, identity, end-user computing) across 20 countries, with multi-million euro investments.' },
+  { role: 'Earlier roles', co: 'Amaris · SFR Business / Telindus · Orange Business Services', when: '2013 – 2017', d: 'Project management and network / telecom engineering for B2B enterprise accounts (WAN, LAN, unified communications, VoIP).' },
+];
+
+const skills = [
+  'Infrastructure program management', 'Cloud transformation & modernization',
+  'Security & compliance (SecNumCloud, ISO 27001, GDPR)', 'Governance & operating model',
+  'Manager-of-managers leadership', 'Distributed team coordination',
+  'Vendor & operator negotiation', 'Executive reporting & KPIs',
+];
+---
+<BaseLayout title="About" description="Delphine Bottarlini — IT Director: enterprise transformation and cloud modernization.">
+  <header>
+    <div class="about-top">
+      <div>
+        <h1>Delphine Bottarlini</h1>
+        <p class="lead">IT Director · Enterprise transformation & cloud modernization</p>
+      </div>
+      <span class="lang-switch"><a href={href('/about')}>Français ↗</a></span>
+    </div>
+    <div class="about-contact">
+      <a class="btn" href="https://www.linkedin.com/in/delphinebottarlini/" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href="mailto:delphine.bottarlini@gmail.com">delphine.bottarlini@gmail.com</a>
+      <a class="btn" href={href('/cv-en.pdf')} download>↓ Download CV</a>
+    </div>
+  </header>
+
+  <div class="prose">
+    <p>
+      Infrastructure leader with <strong>13+ years</strong> delivering enterprise programs,
+      cloud transformation and large-scale modernization across globally distributed
+      organizations (Microsoft, Lagardère Travel Retail, Toshiba, Amplifon, Varonis). I've led
+      multi-million euro programs across 20+ countries — at the intersection of engineering,
+      security, compliance and executive leadership — turning strategic intent into measurable
+      outcomes.
+    </p>
+  </div>
+
+  <h2 style="margin-top:2.5rem">Experience</h2>
+  <div class="cv-list">
+    {experiences.map((e) => (
+      <div class="cv-item">
+        <div class="cv-head">
+          <span><span class="role">{e.role}</span> · <span class="co">{e.co}</span></span>
+          <span class="when">{e.when}</span>
+        </div>
+        <p>{e.d}</p>
+      </div>
+    ))}
+  </div>
+
+  <h2 style="margin-top:2.5rem">Core competencies</h2>
+  <div class="tags" style="margin-top:1rem">
+    {skills.map((s) => <span class="tag">{s}</span>)}
+  </div>
+
+  <div class="cv-cols">
+    <div>
+      <h2>Education</h2>
+      <div class="prose">
+        <p><strong>Master's in Computer Networks</strong><br />University of Strasbourg · 2013</p>
+        <p><strong>Master's in Business Engineering</strong><br />EM Strasbourg · 2014</p>
+      </div>
+    </div>
+    <div>
+      <h2>Certifications & languages</h2>
+      <div class="prose">
+        <p>ITILv3 Foundation (2017)<br />PMP Initiation (2016)</p>
+        <p>French — native<br />English — bilingual</p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

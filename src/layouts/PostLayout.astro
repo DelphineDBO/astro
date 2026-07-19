@@ -1,0 +1,26 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Permalink from '../components/Permalink.astro';
+import { href, formatDate, titleOf } from '../lib/url.js';
+const { post } = Astro.props;
+const { description, pubDate, tags } = post.data;
+const title = titleOf(post);
+---
+<BaseLayout title={title} description={description}>
+  <a class="back" href={href('/')}>← Retour</a>
+  <article>
+    <header class="article-head">
+      <h1>{title}</h1>
+      <div class="meta">{formatDate(pubDate)}</div>
+      {tags?.length > 0 && (
+        <div class="tags">
+          {tags.map((t) => <a class="tag" href={href(`/tags/${t}`)}>{t}</a>)}
+        </div>
+      )}
+      <Permalink />
+    </header>
+    <div class="prose">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

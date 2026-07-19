@@ -1,7 +1,44 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-const pageTitle = "Home Page";
+import PostCard from '../components/PostCard.astro';
+import { href } from '../lib/url.js';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Regrouper les articles par tag (un article multi-tags apparaît sous chacun)
+const byTag = new Map();
+const untagged = [];
+for (const post of posts) {
+  if (post.data.tags.length === 0) { untagged.push(post); continue; }
+  for (const tag of post.data.tags) {
+    if (!byTag.has(tag)) byTag.set(tag, []);
+    byTag.get(tag).push(post);
+  }
+}
+// Tags triés par nombre d'articles (décroissant), puis alphabétiquement
+const groups = [...byTag.entries()]
+  .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+if (untagged.length > 0) groups.push(['Divers', untagged]);
 ---
-<BaseLayout pageTitle={pageTitle}>
-  <h2>My awesome blog subtitle</h2>
+<BaseLayout>
+  <section class="hero">
+    <h1>Delphine DBO</h1>
+    <p>Notes et réflexions autour de la littérature, de la tech et de l’automatisation.</p>
+  </section>
+
+  {groups.map(([tag, tagPosts]) => (
+    <section class="tag-group">
+      <div class="tag-group-head">
+        <h2><a href={href(`/tags/${tag}`)}>#{tag}</a></h2>
+        <a class="tag-group-count" href={href(`/tags/${tag}`)}>
+          {tagPosts.length} article{tagPosts.length > 1 ? 's' : ''} →
+        </a>
+      </div>
+      <div class="post-list">
+        {tagPosts.map((post) => <PostCard post={post} />)}
+      </div>
+    </section>
+  ))}
 </BaseLayout>

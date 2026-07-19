@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { href, formatDate } from '../../lib/url.js';
+
+const projects = (await getCollection('projects', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<BaseLayout title="Projets" description="Quelques réalisations et projets.">
+  <h1>Projets</h1>
+  <p class="muted">Une sélection de réalisations.</p>
+  <div class="grid two" style="margin-top:1.75rem">
+    {projects.map((p) => (
+      <article class="card">
+        <div class="meta muted small">{formatDate(p.data.date)}</div>
+        <h3><a class="stretched" href={href(`/projects/${p.id}`)}>{p.data.title}</a></h3>
+        <p class="muted">{p.data.description}</p>
+      </article>
+    ))}
+  </div>
+</BaseLayout>

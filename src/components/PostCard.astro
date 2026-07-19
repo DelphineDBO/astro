@@ -1,0 +1,16 @@
+---
+import { href, formatDate, titleOf } from '../lib/url.js';
+const { post } = Astro.props;
+const { description, pubDate, tags } = post.data;
+const title = titleOf(post);
+---
+<article class="post-card card">
+  <div class="meta muted small">{formatDate(pubDate)}</div>
+  <h3><a class="stretched" href={href(`/posts/${post.id}`)}>{title}</a></h3>
+  {description && <p class="excerpt">{description}</p>}
+  {tags?.length > 0 && (
+    <div class="tags">
+      {tags.map((t) => <a class="tag" href={href(`/tags/${t}`)}>{t}</a>)}
+    </div>
+  )}
+</article>
