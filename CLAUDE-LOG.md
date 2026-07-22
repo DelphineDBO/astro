@@ -157,3 +157,12 @@ Historique des actions réalisées sur le projet. À jour au **2026-07-19**.
 - Erreur de routing en dev sur ces deux posts : **frontmatter sans champ `reference`** → le slug
   retombait sur le chemin du fichier (`/posts/LIT-002/Livres - Références…`). Fix = ajouter
   `reference: LIT-001` / `reference: LIT-002` (dans Obsidian aussi). Delphine s'en charge.
+
+### Favicon → emoji étoile
+- Remplacement du logo Astro par défaut par l'**emoji ⭐**, en **SVG texte** (`<text>` avec l'emoji)
+  plutôt qu'une image : ultra-léger (**163 o** contre 749), rendu en couleur par la police emoji du
+  système, aucun coût de build. Fichier `public/favicon.svg`.
+- `public/favicon.ico` (ancien logo Astro, 655 o) laissé en place mais **non référencé** dans le
+  `<head>` (seul le `.svg` l'est via `href('favicon.svg')`) → invisible sur navigateurs modernes ;
+  à supprimer un jour pour faire propre.
+- Note : favicons très mis en cache → rechargement forcé (Cmd+Shift+R) pour voir le changement.
