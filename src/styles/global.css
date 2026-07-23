@@ -8,6 +8,7 @@
   --accent: #6b7a34;
   --accent-soft: #eef1e0;
   --tag-color: #5c6a2c; /* accent assombri pour contraste AA sur --accent-soft */
+  --code-bg: #f0eee7; /* fond des blocs de code (gris chaud, distinct de --bg) */
   --radius: 3px;
   --maxw: 720px;
   --font-body: "Hanken Grotesk Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -22,6 +23,7 @@
   --accent: #aeb86a;
   --accent-soft: #23271a;
   --tag-color: var(--accent); /* déjà 7:1 sur fond sombre */
+  --code-bg: #100f0a; /* panneau de code assombri, distinct de --bg */
 }
 
 /* ===== Reset ===== */
@@ -102,9 +104,22 @@ h2 { font-size: 1.6rem; }
 .prose li + li { margin-top: .4rem; }
 .prose blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; color: var(--muted); font-style: italic; }
 .prose code { background: var(--accent-soft); padding: .15em .4em; border-radius: var(--radius); font-size: .9em; }
-.prose pre { background: var(--surface); border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius); overflow-x: auto; }
+.prose pre { position: relative; background: var(--code-bg) !important; border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius); overflow-x: auto; }
 .prose pre code { background: none; padding: 0; }
+/* Coloration Shiki : fond géré par notre palette (ci-dessus) ; en mode sombre,
+   on bascule les couleurs de syntaxe vers le thème dark (variables --shiki-dark). */
+:root[data-theme="dark"] .astro-code,
+:root[data-theme="dark"] .astro-code span { color: var(--shiki-dark) !important; }
+.code-copy { position: absolute; top: .5rem; right: .5rem; display: inline-flex; align-items: center; justify-content: center; padding: .3rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--muted); cursor: pointer; opacity: 0; transition: opacity .2s, color .2s, border-color .2s; }
+.prose pre:hover .code-copy, .code-copy:focus-visible { opacity: 1; }
+.code-copy:hover { color: var(--accent); border-color: var(--accent); }
+.code-copy.copied { color: var(--accent); border-color: var(--accent); opacity: 1; }
+@media (hover: none) { .code-copy { opacity: 1; } }
 .prose img { border-radius: var(--radius); border: 1px solid var(--border); margin-block: 1.5rem; }
+.prose em { color: var(--accent); font-style: italic; }
+.prose table { width: 100%; border-collapse: collapse; margin-block: 1.5rem; font-size: .95rem; }
+.prose th, .prose td { border: 1px solid var(--border); padding: .5rem .7rem; text-align: left; }
+.prose th { background: var(--accent-soft); font-weight: 600; }
 
 /* ===== Article header ===== */
 .article-head { margin-bottom: 1rem; }

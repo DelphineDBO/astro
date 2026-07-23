@@ -1,4 +1,4 @@
-# 📝 Publier un article sur le site
+Aj# 📝 Publier un article sur le site
 
 Mémo : de la note Obsidian à la mise en ligne. **1 code = 1 article = 1 URL permanente.**
 
@@ -69,3 +69,64 @@ Le déploiement se met à jour automatiquement.
 
 > **Copier le dossier → redémarrer le dev → vérifier → commit/push.**
 > Les images, l'URL, le titre et le classement par tag se font tout seuls.
+
+---
+
+# 🗂️ Publier un projet
+
+**Même méthode que pour un article** (dossier de code, `.md` au titre lisible, `_assets/`,
+frontmatter Obsidian). La seule différence : **un projet = un tag**, et chaque `.md` est **une page**
+du projet. Il suffit de donner le **même tag** à plusieurs `.md` pour qu'ils forment un seul projet.
+
+## 1. Structurer le projet dans Obsidian
+
+Un dossier de code **par page** du projet, chacun avec son `_assets/` :
+
+```
+MON-PROJET-intro/
+  Présentation.md
+  MON-PROJET-intro_assets/
+MON-PROJET-techno/
+  Détails techniques.md
+  MON-PROJET-techno_assets/
+```
+
+Frontmatter de chaque page :
+
+```yaml
+reference: mon-projet-techno           # → slug de CETTE page (à ne plus changer)
+tags:
+  - Mon Projet                         # → LE projet (même tag = même projet)
+Date première publication: 2026-07-23  # → date affichée et tri
+publish: true                          # false = brouillon masqué
+description: "Résumé de la page."        # (optionnel) → extrait dans la liste
+url: https://exemple.com               # (optionnel) → bouton « Voir le projet ↗ »
+```
+
+## 2. Copier dans le site
+
+Copier les dossiers de code (avec leurs `_assets/`) dans :
+
+```
+src/content/projects/
+```
+
+## 3. Vérifier en local
+
+Redémarrer le dev (nouveau dossier non détecté à chaud), puis ouvrir :
+
+- La liste des projets : `http://localhost:4321/astro/projects/`
+- Le projet : `http://localhost:4321/astro/projects/Mon Projet/`
+- Une page : `http://localhost:4321/astro/projects/Mon Projet/mon-projet-techno/`
+
+## 📎 Ajouter un fichier `.json` (ou autre) à télécharger
+
+Les **images** fonctionnent comme dans un article (`![[capture.png]]`). Pour un **`.json` à
+télécharger**, le plugin ne le prend pas en charge : le placer dans `public/` (ex.
+`public/projets/mon-projet/data.json`) et y faire un lien dans le `.md` :
+`[Télécharger les données](/astro/projets/mon-projet/data.json)`.
+Un fichier laissé dans `_assets/` n'est **pas** accessible par URL.
+
+## ✅ En résumé (projet)
+
+> **Même tag = même projet.** Une page = un `.md`. Copier → redémarrer le dev → vérifier → commit/push.

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import Permalink from '../components/Permalink.astro';
+import CodeCopy from '../components/CodeCopy.astro';
 import { href, formatDate, titleOf } from '../lib/url.js';
 const { post } = Astro.props;
 const { description, pubDate, tags } = post.data;
@@ -23,4 +24,5 @@ const title = titleOf(post);
       <slot />
     </div>
   </article>
+  <CodeCopy />
 </BaseLayout>

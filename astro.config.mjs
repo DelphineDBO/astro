@@ -8,5 +8,9 @@ export default defineConfig({
   base: '/astro',
   markdown: {
     remarkPlugins: [remarkObsidian],
+    shikiConfig: {
+      // Double thème : suit le mode clair/sombre du site (voir global.css).
+      themes: { light: 'github-light', dark: 'github-dark' },
+    },
   },
 });

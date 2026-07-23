@@ -60,9 +60,8 @@ src/
 
 ## Documentation du projet
 
-- [`AGENTS.md`](AGENTS.md) — contexte, architecture et conventions (lié depuis `CLAUDE.md`)
+- [`AGENTS.md`](AGENTS.md) — contexte, architecture et conventions
 - [`PUBLISHING.md`](PUBLISHING.md) — comment publier un article depuis Obsidian
-- [`CLAUDE-LOG.md`](CLAUDE-LOG.md) — historique des travaux
 
 ## Commandes
 

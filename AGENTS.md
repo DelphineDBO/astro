@@ -6,8 +6,6 @@ typographie soignée, beaucoup d'espace blanc.
 
 ## Documentation du projet (à consulter selon le besoin)
 
-- `CLAUDE-LOG.md` — **historique daté** des décisions et travaux ; le lire pour comprendre le
-  « pourquoi » d'un choix ou reprendre le fil d'une session précédente.
 - `PUBLISHING.md` — procédure pour **publier un article** depuis Obsidian (workflow de Delphine).
 - `README.md` — présentation courte du projet et **rôle de chaque fichier/composant**.
 
@@ -30,10 +28,10 @@ typographie soignée, beaucoup d'espace blanc.
 
 ```
 src/
-├── content.config.ts       # Collections `posts` et `projects` (schémas Zod)
+├── content.config.ts       # Collections `posts` et `projects` (même schéma Obsidian tolérant)
 ├── content/
 │   ├── posts/              # Articles (format Obsidian, voir ci-dessous)
-│   └── projects/          # Projets du portfolio
+│   └── projects/          # Pages de projets (même format ; un projet = un tag)
 ├── layouts/
 │   ├── BaseLayout.astro    # <head>, header, footer, script anti-FOUC du thème
 │   └── PostLayout.astro    # Gabarit d'un article
@@ -45,7 +43,8 @@ src/
 │   ├── posts/[slug].astro  # Page d'un article
 │   ├── tags/index.astro    # Nuage de tags
 │   ├── tags/[tag].astro    # Articles filtrés par tag
-│   └── projects/           # index.astro + [slug].astro
+│   └── projects/           # index (liste des projets = tags)
+│                           #   + [project]/index (page du projet) + [project]/[page]
 ├── plugins/
 │   └── remark-obsidian.mjs # Convertit les images Obsidian ![[...]] (build-time)
 ├── lib/url.js              # href() (respecte base), formatDate(), titleOf()
@@ -71,6 +70,24 @@ de dev (les Content Collections nécessitent un redémarrage pour détecter un n
 
 > Le plugin remark exige `@astrojs/markdown-remark` (le processeur Markdown par défaut d'Astro 7,
 > « Sätteri », ne lance pas les plugins remark sans lui). Dépendance de **build uniquement**.
+
+### Projets : un projet = un tag
+
+La collection `projects` utilise **le même schéma tolérant et le même workflow Obsidian** que les
+articles (dossier `CODE/`, `.md` nommé par le titre lisible, `CODE_assets/`, frontmatter
+`reference`/`tags`/`publish`/`Date première publication`/`description`). La différence est
+**sémantique et dans le routage** :
+
+- **Un projet = un `tag`.** Chaque `.md` est **une page** ; toutes les pages partageant le même tag
+  forment un projet. `reference` donne le slug de la page, `tags` désigne le(s) projet(s).
+- URLs à 3 niveaux : `/projects/` (liste des projets = tags) → `/projects/<tag>/` (page du projet,
+  liste ses pages) → `/projects/<tag>/<reference>/` (une page). Comme pour `/tags/`, le tag sert de
+  segment d'URL **brut** (pas de slugification).
+- Pas de métadonnée propre au projet : son nom = le tag ; sa date/description sur la liste viennent de
+  sa page la plus récente.
+- **Fichiers `.json`** : le plugin ne convertit que les **images** (`![[...]]`). Pour proposer un json
+  au téléchargement, le placer dans `public/` (les fichiers de `src/content/` ne sont pas servis) et y
+  lier via `href()`.
 
 ## Development
 

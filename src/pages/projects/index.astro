@@ -3,8 +3,23 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { href, formatDate } from '../../lib/url.js';
 
-const projects = (await getCollection('projects', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const pages = await getCollection('projects', ({ data }) => !data.draft);
+
+// Un projet = un tag. On regroupe les pages par tag.
+const map = new Map();
+for (const p of pages) {
+  for (const t of p.data.tags) {
+    if (!map.has(t)) map.set(t, []);
+    map.get(t).push(p);
+  }
+}
+
+const projects = [...map.entries()]
+  .map(([tag, items]) => {
+    const sorted = items.sort((a, b) => (b.data.pubDate?.valueOf() ?? 0) - (a.data.pubDate?.valueOf() ?? 0));
+    return { tag, count: sorted.length, date: sorted[0].data.pubDate, description: sorted[0].data.description };
+  })
+  .sort((a, b) => (b.date?.valueOf() ?? 0) - (a.date?.valueOf() ?? 0));
 ---
 <BaseLayout title="Projets" description="Quelques réalisations et projets.">
   <h1>Projets</h1>
@@ -12,9 +27,9 @@ const projects = (await getCollection('projects', ({ data }) => !data.draft))
   <div class="grid two" style="margin-top:1.75rem">
     {projects.map((p) => (
       <article class="card">
-        <div class="meta muted small">{formatDate(p.data.date)}</div>
-        <h3><a class="stretched" href={href(`/projects/${p.id}`)}>{p.data.title}</a></h3>
-        <p class="muted">{p.data.description}</p>
+        <div class="meta muted small">{formatDate(p.date)} · {p.count} page{p.count > 1 ? 's' : ''}</div>
+        <h3><a class="stretched" href={href(`/projects/${p.tag}`)}>{p.tag}</a></h3>
+        {p.description && <p class="muted">{p.description}</p>}
       </article>
     ))}
   </div>
