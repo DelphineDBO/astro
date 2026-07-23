@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { href, formatDate, titleOf } from '../../../lib/url.js';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('projects', ({ data }) => !data.draft);
+  const projects = [...new Set(pages.flatMap((p) => p.data.tags))];
+  return projects.map((project) => ({
+    params: { project },
+    props: {
+      project,
+      pages: pages
+        .filter((p) => p.data.tags.includes(project))
+        .sort((a, b) => (a.data.pubDate?.valueOf() ?? 0) - (b.data.pubDate?.valueOf() ?? 0)),
+    },
+  }));
+}
+
+const { project, pages } = Astro.props;
+---
+<BaseLayout title={project} description={`Le projet ${project}.`}>
+  <a class="back" href={href('/projects')}>← Tous les projets</a>
+  <h1>{project}</h1>
+  <div class="post-list">
+    {pages.map((p) => (
+      <article class="post-card card">
+        <div class="meta muted small">{formatDate(p.data.pubDate)}</div>
+        <h3><a class="stretched" href={href(`/projects/${project}/${p.id}`)}>{titleOf(p)}</a></h3>
+        {p.data.description && <p class="excerpt">{p.data.description}</p>}
+      </article>
+    ))}
+  </div>
+</BaseLayout>

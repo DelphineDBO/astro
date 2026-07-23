@@ -1,0 +1,671 @@
+{
+  "name": "[TEMPLATE] FACTURES - Gmail -> GDrive -> Qonto",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtMinute": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-880, 64],
+      "id": "c15b9691-e59e-461e-8094-d42ac0c2b9fd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "addToDate",
+        "magnitude": "={{ $today }}",
+        "duration": -1,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [-656, 64],
+      "id": "98502aa5-a081-4897-8a7d-872832ff87e0",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "YOUR_GMAIL_LABEL_ID"
+          ],
+          "receivedAfter": "={{ $json.newDate }}"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [-432, 64],
+      "id": "b347347b-9682-4046-b0b8-a26417de6d19",
+      "name": "Gmail",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL",
+          "name": "Your Gmail connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "502c8960-b7b3-4efd-b9a3-181e8752294d",
+              "leftValue": "={{ $binary }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "58af07e9-7957-4650-b0ae-e26f96b47364",
+              "leftValue": "={{ $json.labelIds[1] }}",
+              "rightValue": "SENT",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "8c33457b-c06f-4c16-93e8-095ad270c94a",
+              "leftValue": "={{$binary.data.fileName}}",
+              "rightValue": "Receipt",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-208, 64],
+      "id": "8c950a40-1964-4df3-b6d7-3b80587b7c14",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [16, 160],
+      "id": "89dcf637-0b33-47eb-b2c7-367e114b7109",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "jsCode": "const newItems = [];\n\n// Parcourez chaque item dans la liste des items\nfor (let i = 0; i < items.length; i++) {\n  const binaryData = items[i].binary;\n\n  // Vérifiez si des fichiers binaires existent pour cet item\n  if (binaryData) {\n    // Parcourez chaque fichier binaire dans cet item\n    for (const key in binaryData) {\n      if (binaryData.hasOwnProperty(key)) {\n        // Créez un nouvel item pour chaque fichier binaire\n        const newItem = {\n          json: { ...items[i].json }, // Copiez les autres données JSON si nécessaire\n          binary: {\n            data: binaryData[key],\n          },\n        };\n\n        // Ajoutez le nouvel item à la liste des nouveaux items\n        newItems.push(newItem);\n      }\n    }\n  } else {\n    // Si aucun fichier binaire n'existe, ajoutez l'item original\n    newItems.push(items[i]);\n  }\n}\n\nreturn newItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [16, -48],
+      "id": "0b4b9eaf-90ac-43e6-a953-affa2aad852a",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$binary.data.mimeType}}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2be54c92-c6cf-47c7-874d-9261245fc6dd"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "60c32e18-e492-4a14-9236-f3d70de44b67",
+                    "leftValue": "={{$binary.data.mimeType}}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [240, 64],
+      "id": "ed26bb75-d1f3-41f1-8b39-61723ec80f17",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "name": "={{ $binary.data.fileName}}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "YOUR_GDRIVE_FOLDER_ID",
+          "mode": "list",
+          "cachedResultName": "BOT - NDF"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [816, -208],
+      "id": "a115590e-9756-49b4-b6f3-695aec74b325",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GDRIVE_CREDENTIAL",
+          "name": "Your Google Drive connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "type": "file",
+              "fileType": "base64",
+              "fileName": "={{ $binary.data.fileName }}"
+            },
+            {
+              "content": "Analyse cette note de frais ou cette facture et trouve les éléments demandés dans le format de sortie json."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"date\": {\n      \"type\": \"string\",\n      \"pattern\": \"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\",\n      \"description\": \"Date de la facture au format YYYY-MM-DD\"\n    },\n    \"montant_ttc\": {\n      \"type\": \"number\",\n      \"description\": \"Montant TTC en euros\"\n    },\n    \"fournisseur\": {\n      \"type\": \"string\",\n      \"description\": \"Nom du fournisseur/commerçant/plateforme de vente (par exemple Amazon)\"\n    },\n    \"categorie\": {\n      \"type\": \"string\",\n      \"enum\": [\"restaurant\", \"transport\", \"hotel\", \"fournitures\", \"autre\"],\n      \"description\": \"Catégorie de dépense\"\n    },\n    \"description\": {\n      \"type\": \"string\",\n      \"description\": \"Description courte de la dépense\"\n    }\n  },\n  \"required\": [\"date\", \"montant_ttc\", \"fournisseur\", \"categorie\", \"description\"],\n  \"additionalProperties\": false\n}",
+              "description": "Date de facture du fichier"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [464, -48],
+      "id": "2c07ef85-65fa-48b2-bafc-c9cda61761f3",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL",
+          "name": "Your OpenAI connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "type": "image",
+              "imageType": "base64"
+            },
+            {
+              "content": "Analyse cette note de frais ou cette facture et trouve les éléments demandés dans le format de sortie json."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"date\": {\n      \"type\": \"string\",\n      \"pattern\": \"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\",\n      \"description\": \"Date de la facture au format YYYY-MM-DD\"\n    },\n    \"montant_ttc\": {\n      \"type\": \"number\",\n      \"description\": \"Montant TTC en euros\"\n    },\n    \"fournisseur\": {\n      \"type\": \"string\",\n      \"description\": \"Nom du fournisseur/commerçant/plateforme de vente (par exemple Amazon)\"\n    },\n    \"categorie\": {\n      \"type\": \"string\",\n      \"enum\": [\"restaurant\", \"transport\", \"hotel\", \"fournitures\", \"autre\"],\n      \"description\": \"Catégorie de dépense\"\n    },\n    \"description\": {\n      \"type\": \"string\",\n      \"description\": \"Description courte de la dépense\"\n    }\n  },\n  \"required\": [\"date\", \"montant_ttc\", \"fournisseur\", \"categorie\", \"description\"],\n  \"additionalProperties\": false\n}",
+              "description": "Date de facture du fichier"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [464, 160],
+      "id": "661b066a-af06-45a7-a3ad-a607a4dd8a35",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL",
+          "name": "Your OpenAI connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c804dfe3-a11f-4ca2-a18e-40cd0b12a4cd",
+              "name": "nom_fichier",
+              "value": "={{ $json.output[0].content[0].text.date }}-{{ $json.output[0].content[0].text.fournisseur }}-{{ $json.output[0].content[0].text.montant_ttc }}",
+              "type": "string"
+            },
+            {
+              "id": "10f17685-d1e1-439c-8e8f-3ce8fb48ab81",
+              "name": "invoice_origin",
+              "value": "email",
+              "type": "string"
+            },
+            {
+              "id": "a8ef0d05-579e-4a49-88d9-311fb5a7d864",
+              "name": "invoice_ttc",
+              "value": "={{ $json.output[0].content[0].text.montant_ttc }}",
+              "type": "string"
+            },
+            {
+              "id": "9b5b4e87-6174-49c9-8e81-3be5d787aca6",
+              "name": "invoice_supplier",
+              "value": "={{ $json.output[0].content[0].text.fournisseur }}",
+              "type": "string"
+            },
+            {
+              "id": "69742743-2b31-4abe-a585-df688dfa763a",
+              "name": "invoice_description",
+              "value": "={{ $json.output[0].content[0].text.description }}",
+              "type": "string"
+            },
+            {
+              "id": "902df31a-2ec5-4e5b-a211-901d5e0b5558",
+              "name": "invoice_year",
+              "value": "={{ $json.output[0].content[0].text.date.toDateTime().year }}",
+              "type": "string"
+            },
+            {
+              "id": "aa321040-d305-4bf0-8453-9dd3d1de8ecd",
+              "name": "invoice_date",
+              "value": "={{ $json.output[0].content[0].text.date }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [816, 64],
+      "id": "9d732ec6-933e-47dd-bc20-3421acfd36a7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [1040, -48],
+      "id": "63674d46-ab62-4f81-8c25-607310f72e43",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "newUpdatedFileName": "={{ $json.nom_fichier }}.{{ $json.fileExtension }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1264, -48],
+      "id": "99a8844d-9ac2-4653-9683-2441e4715e6a",
+      "name": "Update file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GDRIVE_CREDENTIAL",
+          "name": "Your Google Drive connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1488, -48],
+      "id": "3d2c5b56-1bf5-46f0-90b8-a1b4cc6f7123",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GDRIVE_CREDENTIAL",
+          "name": "Your Google Drive connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "YOUR_QONTO_INBOX_EMAIL",
+        "subject": "=Facture :  {{ $('Merge').item.json.nom_fichier }}",
+        "message": "=Facture :  {{ $('Merge').item.json.nom_fichier }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "=data"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1712, -48],
+      "id": "30590f7e-29a4-418e-b43d-d525b1565fff",
+      "name": "Send a message",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL",
+          "name": "Your Gmail connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "YOUR_SUPABASE_TABLE",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "invoice_date",
+              "fieldValue": "={{ $('Merge').item.json.invoice_date }}"
+            },
+            {
+              "fieldId": "invoice_ttc",
+              "fieldValue": "={{ $('Merge').item.json.invoice_ttc }}"
+            },
+            {
+              "fieldId": "invoice_supplier",
+              "fieldValue": "={{ $('Merge').item.json.invoice_supplier }}"
+            },
+            {
+              "fieldId": "invoice_description",
+              "fieldValue": "={{ $('Merge').item.json.invoice_description }}"
+            },
+            {
+              "fieldId": "invoice_year",
+              "fieldValue": "={{ $('Merge').item.json.invoice_year }}"
+            },
+            {
+              "fieldId": "invoice_filename",
+              "fieldValue": "={{ $('Merge').item.json.nom_fichier }}"
+            },
+            {
+              "fieldId": "invoice_origin",
+              "fieldValue": "={{ $('Merge').item.json.invoice_origin }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1904, -48],
+      "id": "c53bc4fe-afff-4334-9bfa-009f8dd51bb9",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YOUR_SUPABASE_CREDENTIAL",
+          "name": "Your Supabase connection"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update file": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "tags": []
+}

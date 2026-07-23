@@ -1,0 +1,42 @@
+---
+// Injecte un bouton « Copier » en haut à droite de chaque bloc de code (.prose pre).
+// Vanilla JS bundlé (pas d'island), même logique de repli que Permalink.
+---
+<script>
+  const COPY_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  const CHECK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  document.querySelectorAll('.prose pre').forEach((pre) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    btn.innerHTML = COPY_SVG;
+    btn.setAttribute('aria-label', 'Copier le code');
+    btn.setAttribute('title', 'Copier le code');
+    pre.appendChild(btn);
+
+    btn.addEventListener('click', async () => {
+      const code = pre.querySelector('code')?.innerText ?? pre.innerText;
+      try {
+        await navigator.clipboard.writeText(code);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = code;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      btn.innerHTML = CHECK_SVG;
+      btn.classList.add('copied');
+      btn.setAttribute('title', 'Copié !');
+      setTimeout(() => {
+        btn.innerHTML = COPY_SVG;
+        btn.classList.remove('copied');
+        btn.setAttribute('title', 'Copier le code');
+      }, 2000);
+    });
+  });
+</script>

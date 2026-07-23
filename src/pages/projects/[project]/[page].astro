@@ -1,0 +1,37 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Permalink from '../../../components/Permalink.astro';
+import CodeCopy from '../../../components/CodeCopy.astro';
+import { href, formatDate, titleOf } from '../../../lib/url.js';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('projects', ({ data }) => !data.draft);
+  return pages.flatMap((page) =>
+    page.data.tags.map((project) => ({
+      params: { project, page: page.id },
+      props: { project, page },
+    }))
+  );
+}
+
+const { project, page } = Astro.props;
+const { Content } = await render(page);
+const title = titleOf(page);
+const { description, pubDate, url, tags } = page.data;
+---
+<BaseLayout title={title} description={description}>
+  <a class="back" href={href(`/projects/${project}`)}>← {project}</a>
+  <article>
+    <header class="article-head">
+      <h1>{title}</h1>
+      <div class="meta">{formatDate(pubDate)}{url && <> · <a href={url} target="_blank" rel="noopener" style="color:var(--accent)">Voir le projet ↗</a></>}</div>
+      {tags?.length > 0 && (
+        <div class="tags">{tags.map((t) => <a class="tag" href={href(`/projects/${t}`)}>{t}</a>)}</div>
+      )}
+      <Permalink />
+    </header>
+    <div class="prose"><Content /></div>
+  </article>
+  <CodeCopy />
+</BaseLayout>
